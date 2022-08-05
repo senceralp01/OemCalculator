@@ -1,11 +1,11 @@
 // MODULE PATTERN APP
 
-// Storage Controller (Module)
+// ***** Storage Controller (Module) *****
 const StorageController = (function() {
 
 })(); // IIFE (Immediately Invoked Function Expression)
 
-// Product Controller (Module)
+// ***** Product Controller (Module) *****
 const ProductController = (function() {
     
     //private//
@@ -45,13 +45,21 @@ const ProductController = (function() {
             const newProduct = new Product(id, name, parseFloat(price));
             data.products.push(newProduct);
             return newProduct;
+        },
+        getTotal: function(){
+            let total = 0;
+            data.products.forEach(item => {
+                total += item.price;
+            });
+            data.totalPrice = total;
+            return data.totalPrice;
         }
     }
 
 
 })();
 
-// UI Controller (Module)
+// ***** UI Controller (Module) *****
 const UIController = (function() {
 
     //private//
@@ -60,7 +68,9 @@ const UIController = (function() {
         addButton: '.addBtn',
         productName: '#productName',
         productPrice: '#productPrice',
-        productCard: '#productCard'
+        productCard: '#productCard',
+        totalTl: '#total-tl',
+        totalDollar: '#total-dollar'
     }
 
     //public//
@@ -113,11 +123,25 @@ const UIController = (function() {
         },
         hideCard: function() {
             document.querySelector(Selectors.productCard).style.display = 'none';
+        },
+        showTotal: async (total) => {
+            const api_key = "1dfbf427ddec9712b8ea50fd";
+            const url = "https://v6.exchangerate-api.com/v6/" + api_key + "/latest/USD";
+
+            // Get Dollar <=> TL currency by API
+            const response = await fetch(url);
+            const responseData = await response.json();
+            let currency = responseData.conversion_rates.TRY;
+            console.log(currency);
+
+            document.querySelector(Selectors.totalDollar).textContent = `${total} $`;
+            document.querySelector(Selectors.totalTl).textContent = `${total*currency} TL`;
         }
+
     }
 })();
 
-// App Controller (Module)
+// ***** App Controller (Module) *****
 const App = (function(ProductCtrl, UICtrl){
 
     //private//
@@ -139,6 +163,13 @@ const App = (function(ProductCtrl, UICtrl){
 
             //Add product to list
             UICtrl.addProductToList(newProduct);
+
+            //Get total price
+            const total = ProductCtrl.getTotal();
+
+            //Show total price
+            UICtrl.showTotal(total);
+            
 
             //Clear inputs
             UIController.clearInputs();
