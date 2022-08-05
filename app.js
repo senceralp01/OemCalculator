@@ -7,7 +7,7 @@ const StorageController = (function() {
 // Product Controller (Module)
 const ProductController = (function() {
     
-    //private
+    //private//
     const Product = function (id, name, price){
         this.id = id;
         this.name = name;
@@ -25,13 +25,25 @@ const ProductController = (function() {
         totalPrice: 0
     }
 
-    //public
+    //public//
     return{
-        getProducts: function(){
+        getProducts: function() {
             return data.products;
         },
-        getData: function (){
+        getData: function() {
             return data;
+        },
+        addProduct: function(name, price) {
+            let id;
+
+            if(data.products.length>0){
+                id = data.products[data.products.length-1].id+1;
+            }else{
+                id = 0;
+            }
+            const newProduct = new Product(id, name, parseFloat(price));
+            data.products.push(newProduct);
+            return newProduct;
         }
     }
 
@@ -41,12 +53,15 @@ const ProductController = (function() {
 // UI Controller (Module)
 const UIController = (function() {
 
-    //private
+    //private//
     const Selectors = {
-        productList: "#item-list"
+        productList: "#item-list",
+        addButton: '.addBtn',
+        productName: '#productName',
+        productPrice: '#productPrice'
     }
 
-    //public
+    //public//
     return{
         createProductList: function(products){
             let html = '';
@@ -77,7 +92,31 @@ const UIController = (function() {
 // App Controller (Module)
 const App = (function(ProductCtrl, UICtrl){
 
-    //public
+    //private//
+    const UISelectors = UICtrl.getSelectors();
+
+    //Load Event Listeners
+    const loadEventListeners = function(){
+        //add product event
+        document.querySelector(UISelectors.addButton).addEventListener('click', productAddSubmit);
+    }
+
+    const productAddSubmit = function(e){
+        const productName = document.querySelector(UISelectors.productName).value;
+        const productPrice = document.querySelector(UISelectors.productPrice).value;
+
+        if(productName !== '' && productPrice !== ''){
+            //Add product
+            const newProduct = ProductCtrl.addProduct(productName, productPrice);
+
+
+        }
+
+
+        e.preventDefault();
+    }
+
+    //public//
     return{
         init: function(){
             console.log("Starting App..");
@@ -85,6 +124,8 @@ const App = (function(ProductCtrl, UICtrl){
             
             UICtrl.createProductList(products);
 
+            //load event listeners
+            loadEventListeners();
         }
     }
 })(ProductController, UIController);
