@@ -17,8 +17,9 @@ const ProductController = (function() {
     const data = {
         products: [
             {id:0, name:'Monitor', price: 100},
-            {id:0, name:'Ram', price: 30},
-            {id:0, name:'Klavye', price: 10}
+            {id:1, name:'Ram', price: 30},
+            {id:2, name:'Klavye', price: 10},
+            {id:3, name:'Mouse', price: 5}
         ],
         selectedProduct: null,
         totalPrice: 0
@@ -40,6 +41,37 @@ const ProductController = (function() {
 // UI Controller (Module)
 const UIController = (function() {
 
+    //private
+    const Selectors = {
+        productList: "#item-list"
+    }
+
+    //public
+    return{
+        createProductList: function(products){
+            let html = '';
+
+            products.forEach(prd => {
+                html += `
+                    <tr>
+                        <td>${prd.id}</td>
+                        <td>${prd.name}</td>
+                        <td>${prd.price} $</td>
+                        <td class="text-right">
+                        <button type="submit" class="btn btn-warning btn-sm">
+                            <i class="far fa-edit"></i>
+                        </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.querySelector(Selectors.productList).innerHTML = html;
+        },
+        getSelectors: function(){
+            return Selectors;
+        }
+    }
 })();
 
 // App Controller (Module)
