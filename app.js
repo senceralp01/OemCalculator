@@ -1,3 +1,4 @@
+// MODULE PATTERN APP
 
 // Storage Controller (Module)
 const StorageController = (function() {
@@ -58,7 +59,8 @@ const UIController = (function() {
         productList: "#item-list",
         addButton: '.addBtn',
         productName: '#productName',
-        productPrice: '#productPrice'
+        productPrice: '#productPrice',
+        productCard: '#productCard'
     }
 
     //public//
@@ -87,6 +89,8 @@ const UIController = (function() {
             return Selectors;
         },
         addProductToList: function(newPrd){
+
+            document.querySelector(Selectors.productCard).style.display = 'block';
             var item = `
                 <tr>
                     <td>${newPrd.id}</td>
@@ -106,6 +110,9 @@ const UIController = (function() {
             document.querySelector(Selectors.productName).value = '';
             document.querySelector(Selectors.productPrice).value = '';
 
+        },
+        hideCard: function() {
+            document.querySelector(Selectors.productCard).style.display = 'none';
         }
     }
 })();
@@ -146,8 +153,12 @@ const App = (function(ProductCtrl, UICtrl){
         init: function(){
             console.log("Starting App..");
             const products = ProductCtrl.getProducts();
-            
-            UICtrl.createProductList(products);
+
+            if(products.length == 0){
+                UICtrl.hideCard();
+            }else{
+                UICtrl.createProductList(products);
+            }
 
             //load event listeners
             loadEventListeners();
