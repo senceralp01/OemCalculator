@@ -16,10 +16,10 @@ const ProductController = (function() {
 
     const data = {
         products: [
-            {id:0, name:'Monitor', price: 100},
-            {id:1, name:'Ram', price: 30},
-            {id:2, name:'Klavye', price: 10},
-            {id:3, name:'Mouse', price: 5}
+            // {id:0, name:'Monitor', price: 100},
+            // {id:1, name:'Ram', price: 30},
+            // {id:2, name:'Klavye', price: 10},
+            // {id:3, name:'Mouse', price: 5}
         ],
         selectedProduct: null,
         totalPrice: 0
@@ -85,6 +85,27 @@ const UIController = (function() {
         },
         getSelectors: function(){
             return Selectors;
+        },
+        addProductToList: function(newPrd){
+            var item = `
+                <tr>
+                    <td>${newPrd.id}</td>
+                    <td>${newPrd.name}</td>
+                    <td>${newPrd.price} $</td>
+                    <td class="text-right">
+                    <button type="submit" class="btn btn-warning btn-sm">
+                        <i class="far fa-edit"></i>
+                    </button>
+                    </td>
+                </tr>
+            `;
+
+            document.querySelector(Selectors.productList).innerHTML += item;
+        },
+        clearInputs: function(){
+            document.querySelector(Selectors.productName).value = '';
+            document.querySelector(Selectors.productPrice).value = '';
+
         }
     }
 })();
@@ -106,10 +127,14 @@ const App = (function(ProductCtrl, UICtrl){
         const productPrice = document.querySelector(UISelectors.productPrice).value;
 
         if(productName !== '' && productPrice !== ''){
-            //Add product
+            //Add new product
             const newProduct = ProductCtrl.addProduct(productName, productPrice);
 
+            //Add product to list
+            UICtrl.addProductToList(newProduct);
 
+            //Clear inputs
+            UIController.clearInputs();
         }
 
 
