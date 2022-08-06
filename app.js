@@ -46,6 +46,12 @@ const ProductController = (function() {
             return product;
 
         },
+        setCurrentProduct: function(product){
+            data.selectedProduct = product;
+        },
+        getCurrentProduct: function(){
+            return data.selectedProduct;
+        },
         addProduct: function(name, price) {
             let id;
 
@@ -78,6 +84,10 @@ const UIController = (function() {
     const Selectors = {
         productList: "#item-list",
         addButton: '.addBtn',
+        addButton: '.addBtn',
+        updateButton: '.updateBtn',
+        cancelButton: '.cancelBtn',
+        deleteButton: '.deleteBtn',
         productName: '#productName',
         productPrice: '#productPrice',
         productCard: '#productCard',
@@ -140,12 +150,29 @@ const UIController = (function() {
             const response = await fetch(url);
             const responseData = await response.json();
             let currency = responseData.conversion_rates.TRY;
-            console.log(currency);
-
+            
             document.querySelector(Selectors.totalDollar).textContent = `${total} $`;
             document.querySelector(Selectors.totalTl).textContent = `${total*currency} TL`;
-        }
+        },
+        addProductToForm: function(){
+            const selectedProduct = ProductController.getCurrentProduct();
+            document.querySelector(Selectors.productName).value = selectedProduct.name;
+            document.querySelector(Selectors.productPrice).value = selectedProduct.price;
 
+        },
+        addingState: function() {
+            UIController.clearInputs();
+            document.querySelector(Selectors.addButton).style.display = 'inline';
+            document.querySelector(Selectors.updateButton).style.display = 'block';
+            document.querySelector(Selectors.deleteButton).style.display = 'block';
+            document.querySelector(Selectors.cancelButton).style.display = 'block';
+        },
+        updateState: function() {
+            document.querySelector(Selectors.addButton).style.display = 'none';
+            document.querySelector(Selectors.updateButton).style.display = 'inline';
+            document.querySelector(Selectors.deleteButton).style.display = 'inline';
+            document.querySelector(Selectors.cancelButton).style.display = 'inline';
+        }
     }
 })();
 
@@ -184,7 +211,7 @@ const App = (function(ProductCtrl, UICtrl){
             
 
             //Clear inputs
-            UIController.clearInputs();
+            UICtrl.clearInputs();
         }
 
 
@@ -199,7 +226,13 @@ const App = (function(ProductCtrl, UICtrl){
 
             //get selected product
             const product = ProductCtrl.getProductById(id);
-            console.log(product);
+            
+            //set current product
+            ProductCtrl.setCurrentProduct(product);
+
+            //add product to UI
+            UICtrl.addProductToForm();
+
         }
 
         e.preventDefault();
@@ -209,6 +242,7 @@ const App = (function(ProductCtrl, UICtrl){
     return{
         init: function(){
             console.log("Starting App..");
+            UICtrl.addingState();
             const products = ProductCtrl.getProducts();
 
             if(products.length == 0){
