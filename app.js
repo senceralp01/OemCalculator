@@ -14,6 +14,16 @@ const StorageController = (function() {
                 products.push(newProduct);
             }
             localStorage.setItem('products', JSON.stringify(products));
+        },
+        getProducts: function() {
+            let products;
+            if(localStorage.getItem('products') === null){
+                products = [];
+            }else{
+                products = JSON.parse(localStorage.getItem('products'));
+            }
+
+            return products;
         }
     }
 })(); // IIFE (Immediately Invoked Function Expression)
@@ -29,12 +39,7 @@ const ProductController = (function() {
     }
 
     const data = {
-        products: [
-            // {id:0, name:'Monitor', price: 100},
-            // {id:1, name:'Ram', price: 30},
-            // {id:2, name:'Klavye', price: 10},
-            // {id:3, name:'Mouse', price: 5}
-        ],
+        products: StorageController.getProducts(),
         selectedProduct: null,
         totalPrice: 0
     }
@@ -246,7 +251,7 @@ const UIController = (function() {
 })();
 
 // ***** App Controller (Module) *****
-const App = (function(ProductCtrl, UICtrl){
+const App = (function(ProductCtrl, UICtrl, StorageCtrl){
 
     //private//
     const UISelectors = UICtrl.getSelectors();
@@ -281,13 +286,15 @@ const App = (function(ProductCtrl, UICtrl){
             //Add product to list
             UICtrl.addProductToList(newProduct);
 
+            //Add product to Local Storage
+            StorageCtrl.storeProduct(newProduct);
+
             //Get total price
             const total = ProductCtrl.getTotal();
 
             //Show total price
             UICtrl.showTotal(total);
             
-
             //Clear inputs
             UICtrl.clearInputs();
         }
@@ -386,7 +393,7 @@ const App = (function(ProductCtrl, UICtrl){
         init: function(){
             console.log("Starting App..");
             UICtrl.addingState();
-
+            
             const products = ProductCtrl.getProducts();
 
             if(products.length == 0){
@@ -399,6 +406,6 @@ const App = (function(ProductCtrl, UICtrl){
             loadEventListeners();
         }
     }
-})(ProductController, UIController);
+})(ProductController, UIController, StorageController);
 
 App.init();
