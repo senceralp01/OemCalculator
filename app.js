@@ -78,6 +78,14 @@ const ProductController = (function() {
 
             return product;
         },
+        deleteProduct: function(product) {
+            data.products.forEach((prd, index) => {
+                if(prd.id == product.id){
+                    data.products.splice(index,1);
+                }
+            })
+            
+        },
         getTotal: function(){
             let total = 0;
             data.products.forEach(item => {
@@ -163,10 +171,19 @@ const UIController = (function() {
 
             return updatedItem
         },
-        clearInputs: function(){
+        clearInputs: function (){
             document.querySelector(Selectors.productName).value = '';
             document.querySelector(Selectors.productPrice).value = '';
 
+        },
+        clearWarnnigs: function() {
+            const items = document.querySelectorAll(Selectors.productListItems);
+            items.forEach(item => {
+                // item.classList.remove('bg-warning');
+                if(item.classList.contains('bg-warning')){
+                    item.classList.remove('bg-warning');
+                }
+            });
         },
         hideCard: function() {
             document.querySelector(Selectors.productCard).style.display = 'none';
@@ -190,23 +207,15 @@ const UIController = (function() {
 
         },
         addingState: function(item) {
-            if(item){
-                item.classList.remove('bg-warning');
-            }
+            UIController.clearWarnnigs();
             UIController.clearInputs();
             document.querySelector(Selectors.addButton).style.display = 'inline';
             document.querySelector(Selectors.updateButton).style.display = 'none';
             document.querySelector(Selectors.deleteButton).style.display = 'none';
             document.querySelector(Selectors.cancelButton).style.display = 'none';
         },
-        eidtState: function(tr) {
-
-            const parent = tr.parentNode;
-            for (let i=0; i<parent.children.length; i++){
-                parent.children[i].classList.remove('bg-warning');
-            }
+        editState: function(tr) {
             tr.classList.add('bg-warning');
-
             document.querySelector(Selectors.addButton).style.display = 'none';
             document.querySelector(Selectors.updateButton).style.display = 'inline';
             document.querySelector(Selectors.deleteButton).style.display = 'inline';
@@ -232,6 +241,12 @@ const App = (function(ProductCtrl, UICtrl){
 
         //edit product submit
         document.querySelector(UISelectors.updateButton).addEventListener('click', editProductSubmit);
+
+        //cancel button click
+        document.querySelector(UISelectors.cancelButton).addEventListener('click', cancelUpdate);
+
+        //delete button click
+        document.querySelector(UISelectors.deleteButton).addEventListener('click', deleteProductSubmit);
     }
 
     const productAddSubmit = function(e){
@@ -272,11 +287,14 @@ const App = (function(ProductCtrl, UICtrl){
             //set current product
             ProductCtrl.setCurrentProduct(product);
 
+            //clear bg-warning
+            UICtrl.clearWarnnigs();
+
             //add product to UI
             UICtrl.addProductToForm();
 
             //pass to edit state
-            UICtrl.eidtState(e.target.parentNode.parentNode);
+            UICtrl.editState(e.target.parentNode.parentNode);
 
         }
 
@@ -302,9 +320,27 @@ const App = (function(ProductCtrl, UICtrl){
             //Show total price
             UICtrl.showTotal(total);
 
-            UICtrl.addingState(item);
+            UICtrl.addingState();
 
         }
+
+        e.preventDefault();
+    }
+
+    const cancelUpdate = (e) => {
+
+        UICtrl.addingState();
+        UICtrl.clearWarnnigs();
+        e.preventDefault();
+    }
+
+    const deleteProductSubmit = (e) => {
+
+        //get selected product
+        const selectedProduct = ProductCtrl.getCurrentProduct();
+
+        //delete product from Product Controller
+        ProductCtrl.deleteProduct(selectedProduct);
 
         e.preventDefault();
     }
