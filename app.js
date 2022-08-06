@@ -3,6 +3,19 @@
 // ***** Storage Controller (Module) *****
 const StorageController = (function() {
 
+    return{
+        storeProduct: function(newProduct){
+            let products;
+            if(localStorage.getItem('products') === null){
+                products = [];
+                products.push(newProduct);
+            }else{
+                products = JSON.parse(localStorage.getItem('products'));
+                products.push(newProduct);
+            }
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+    }
 })(); // IIFE (Immediately Invoked Function Expression)
 
 // ***** Product Controller (Module) *****
