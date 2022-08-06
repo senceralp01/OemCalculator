@@ -206,6 +206,14 @@ const UIController = (function() {
             document.querySelector(Selectors.productPrice).value = selectedProduct.price;
 
         },
+        deleteProduct: function() {
+            let items = document.querySelectorAll(Selectors.productListItems);
+            items.forEach(item => {
+                if(item.classList.contains('bg-warning')){
+                    item.remove();
+                }
+            })
+        },
         addingState: function(item) {
             UIController.clearWarnnigs();
             UIController.clearInputs();
@@ -341,6 +349,21 @@ const App = (function(ProductCtrl, UICtrl){
 
         //delete product from Product Controller
         ProductCtrl.deleteProduct(selectedProduct);
+
+        //delete product line from the UI
+        UICtrl.deleteProduct();
+
+        //Get total price
+        const total = ProductCtrl.getTotal();
+
+        //Show total price
+        UICtrl.showTotal(total);
+
+        UICtrl.addingState();
+
+        if(total == 0){
+            UICtrl.hideCard();
+        }
 
         e.preventDefault();
     }
