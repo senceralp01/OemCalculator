@@ -163,11 +163,18 @@ const UIController = (function() {
         addingState: function() {
             UIController.clearInputs();
             document.querySelector(Selectors.addButton).style.display = 'inline';
-            document.querySelector(Selectors.updateButton).style.display = 'block';
-            document.querySelector(Selectors.deleteButton).style.display = 'block';
-            document.querySelector(Selectors.cancelButton).style.display = 'block';
+            document.querySelector(Selectors.updateButton).style.display = 'none';
+            document.querySelector(Selectors.deleteButton).style.display = 'none';
+            document.querySelector(Selectors.cancelButton).style.display = 'none';
         },
-        updateState: function() {
+        eidtState: function(tr) {
+
+            const parent = tr.parentNode;
+            for (let i=0; i<parent.children.length; i++){
+                parent.children[i].classList.remove('bg-warning');
+            }
+            tr.classList.add('bg-warning');
+
             document.querySelector(Selectors.addButton).style.display = 'none';
             document.querySelector(Selectors.updateButton).style.display = 'inline';
             document.querySelector(Selectors.deleteButton).style.display = 'inline';
@@ -233,6 +240,9 @@ const App = (function(ProductCtrl, UICtrl){
             //add product to UI
             UICtrl.addProductToForm();
 
+            //pass to edit state
+            UICtrl.eidtState(e.target.parentNode.parentNode);
+
         }
 
         e.preventDefault();
@@ -243,6 +253,7 @@ const App = (function(ProductCtrl, UICtrl){
         init: function(){
             console.log("Starting App..");
             UICtrl.addingState();
+
             const products = ProductCtrl.getProducts();
 
             if(products.length == 0){
