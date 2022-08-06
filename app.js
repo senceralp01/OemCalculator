@@ -24,6 +24,25 @@ const StorageController = (function() {
             }
 
             return products;
+        },
+        updateProduct: function(updatedProduct) {
+            let products = JSON.parse(localStorage.getItem('products'));
+            products.forEach((prd, index) => {
+                if(prd.id == updatedProduct.id){
+                    products.splice(index, 1, updatedProduct);
+                }
+            });
+            localStorage.setItem('products', JSON.stringify(products));
+        },
+        deleteProduct: function(id) {
+            let products = JSON.parse(localStorage.getItem('products'));
+            products.forEach((prd, index) => {
+                if(prd.id == id){
+                    products.splice(index, 1);
+                }
+            });
+            localStorage.setItem('products', JSON.stringify(products));
+
         }
     }
 })(); // IIFE (Immediately Invoked Function Expression)
@@ -216,7 +235,7 @@ const UIController = (function() {
             let currency = responseData.conversion_rates.TRY;
             
             document.querySelector(Selectors.totalDollar).textContent = `${total} $`;
-            document.querySelector(Selectors.totalTl).textContent = `${total*currency} TL`;
+            document.querySelector(Selectors.totalTl).textContent = `${(total*currency).toFixed(3)} TL`;
         },
         addProductToForm: function(){
             const selectedProduct = ProductController.getCurrentProduct();
@@ -348,6 +367,9 @@ const App = (function(ProductCtrl, UICtrl, StorageCtrl){
             //Show total price
             UICtrl.showTotal(total);
 
+            //update Local Storage
+            StorageCtrl.updateProduct(updatedProduct);
+
             UICtrl.addingState();
 
         }
@@ -379,6 +401,9 @@ const App = (function(ProductCtrl, UICtrl, StorageCtrl){
         //Show total price
         UICtrl.showTotal(total);
 
+        //delete product from the Local Storage
+        StorageCtrl.deleteProduct(selectedProduct.id);
+
         UICtrl.addingState();
 
         if(total == 0){
@@ -392,8 +417,9 @@ const App = (function(ProductCtrl, UICtrl, StorageCtrl){
     return{
         init: function(){
             console.log("Starting App..");
+
             UICtrl.addingState();
-            
+
             const products = ProductCtrl.getProducts();
 
             if(products.length == 0){
@@ -401,6 +427,12 @@ const App = (function(ProductCtrl, UICtrl, StorageCtrl){
             }else{
                 UICtrl.createProductList(products);
             }
+
+            // get total
+            const total = ProductCtrl.getTotal();
+
+            // show total
+            UICtrl.showTotal(total);
 
             //load event listeners
             loadEventListeners();
